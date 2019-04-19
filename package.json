@@ -24,13 +24,20 @@
   },
   "homepage": "https://github.com/salzoff/mapshares-backend#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
+    "express-bearer-token": "^2.4.0",
     "express-jsonschema": "^1.1.6",
-    "firebase-admin": "^7.2.0"
+    "express-session": "^1.16.1",
+    "firebase": "^5.9.4",
+    "firebase-admin": "^7.2.0",
+    "firestore-store": "^1.0.0",
+    "geofirestore": "^3.2.3",
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "@babel/core": "^7.4.3",
