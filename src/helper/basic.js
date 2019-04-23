@@ -15,6 +15,11 @@ const extractPlainValuesAndArrays = _partialRight(extractValuesByFunction, value
         || (value instanceof Array && value.every(entry => ['string', 'boolean', 'number'].includes(typeof entry)));
 });
 
+const calculateApproximateNumber = (value, step) => {
+    return (Math.floor(value / step) + 1) * step;
+}
+
 export {
+    calculateApproximateNumber,
     extractPlainValuesAndArrays
 };

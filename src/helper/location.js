@@ -1,4 +1,6 @@
 const geoDistance = (point1, point2) => {
+    console.log(point1);
+    console.log(point2);
     const R = 6371e3; // metres
     const φ1 = toRadians(point1.lat);
     const φ2 = toRadians(point2.lat);

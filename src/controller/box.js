@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import BoxService from '../service/BoxService';
 import AuthService from '../service/AuthService';
-
+import config from '../config';
 const authService = new AuthService();
 const boxService = new BoxService();
 const boxRouter = express.Router();
@@ -21,8 +21,21 @@ boxRouter.use((req, res, next) => {
         next();
     }
 });
-boxRouter.get('/boxesforlocation', (req, res) => {
-    boxService.getBoxesNearby(req.session.user).then(result => {
+boxRouter.get('/boxesformap', (req, res) => {
+    boxService.getObjectsForLocation(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), config.mapQueryRadius, [3, 4]).then(result => {
+        res.json(result);
+    });
+});
+
+boxRouter.get('/boxesnearby', (req, res) => {
+    boxService.getObjectsForLocation(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), config.boxQueryDistance, [2, 4]).then(result => {
+        res.json(result);
+    });
+});
+
+boxRouter.get('/boxlist', (req, res) => {
+    boxService.getBoxList(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), req.query.start ? req.query.start : 0, req.query.limit ? req.query.limit : 10).then(result => {
+        console.log(result);
         res.json(result);
     });
 });

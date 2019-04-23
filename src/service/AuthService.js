@@ -3,6 +3,7 @@ import admin from 'firebase-admin';
 import { userCollection, userProfileCollection } from '../../firebaseConfig';
 import { extractPlainValuesAndArrays } from '../helper/basic';
 import { geoDistance } from '../helper/location';
+import { UserRefreshClient } from 'google-auth-library';
 
 let instance = false;
 const url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo?key=AIzaSyDqHeavSoFvMB0VtZDBMfqNwC1VLW7A2PY';
@@ -22,12 +23,13 @@ export default class AuthService {
         return new Promise((resolve, reject) => {
             authRequest.post('', { idToken })
                 .then(result => {
-                    const user = {
+                    let user = {
                         id: result.data.users[0].localId,
                         eMail: result.data.users[0].email
                     };
                     this.getUserProfile(user.id).then(userProfile => {
                         Object.assign(user, userProfile);
+                        user = this.prepareUser(user);
                         resolve(user);
                     });
                 }).catch(e => {
@@ -45,7 +47,7 @@ export default class AuthService {
                     const userRoleData = userRole.data();
                     userData.role = userRoleData.name;
                     userData.permissions = userRoleData.permissions;
-                    resolve(extractPlainValuesAndArrays(userData));
+                    resolve(userData);
                 });
             });
         });
@@ -70,5 +72,30 @@ export default class AuthService {
             lastLocationAt: user.lastLocationAt,
             coveredDistance: user.coveredDistance
         });
+    }
+
+    prepareUser(user) {
+        const newUser = {
+            coveredDistance: user.coveredDistance ? user.coveredDistance : 0,
+            createdAt: user.createdAt,
+            email: user.email,
+            firstName: user.firstName,
+            homepage: user.homepage,
+            imageUrl: user.imageUrl,
+            lastLocation: user.lastLocation,
+            lastLocationAt: user.lastLocationAt,
+            lastLogin: user.lastLogin,
+            name: user.name,
+            permissions: user.permissions,
+            id: user.id
+        };
+        if (user.createdBoxes) {
+            newUser.createdBoxes = user.createdBoxes.map(box => box.ref);
+        }
+        if (user.foundBoxes) {
+            newUser.foundBoxes = user.foundBoxes.map(box => box.ref);
+        }
+        console.log(newUser);
+        return newUser;
     }
 }
