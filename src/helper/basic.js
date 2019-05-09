@@ -1,7 +1,6 @@
 import _partialRight from 'lodash/partialRight';
 
 const extractValuesByFunction = (baseObj, fn) => {
-    console.log(baseObj, fn);
     return Object.keys(baseObj).reduce((result, key) => {
         if (fn(baseObj[key])) {
             result[key] = baseObj[key];

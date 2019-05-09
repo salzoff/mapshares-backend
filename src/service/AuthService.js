@@ -74,6 +74,32 @@ export default class AuthService {
         });
     }
 
+    checkForFraud(user, latitude, longitude) {
+        return true;
+        if (user.temporaryLocations) {
+            user.temporaryLocations = [];
+        }
+        const newEntry = {
+            location: {
+                lat: latitude,
+                lng: longitude
+            },
+            timestamp: Date.now()
+        };
+        if (user.temporaryLocations.length > 0) {
+            newEntry.distanceToPrevious = geoDistance(newEntry.location, user.temporaryLocations[user.temporaryLocations.length - 1].location);
+        }
+        user.temporaryLocations.push(newEntry);
+        const now = Date.now();
+        user.temporaryLocations = user.temporaryLocations.filter(entry => now - entry.timestamp < 3600000);
+        user.temporaryLocations[0].distanceToPrevious = 0;
+        user.checkDistance = user.temporaryLocations.reduce((sum, entry) => {
+            sum += entry.distanceToPrevious;
+            return sum;
+        }, 0);
+        return user.checkDistance < 6000;
+    }
+
     prepareUser(user) {
         const newUser = {
             coveredDistance: user.coveredDistance ? user.coveredDistance : 0,
@@ -95,7 +121,6 @@ export default class AuthService {
         if (user.foundBoxes) {
             newUser.foundBoxes = user.foundBoxes.map(box => box.ref);
         }
-        console.log(newUser);
         return newUser;
     }
 }

@@ -17,12 +17,15 @@ boxRouter.use((req, res, next) => {
 });
 boxRouter.use((req, res, next) => {
     if (req.query.latitude && req.query.longitude) {
-        authService.updateUserLocation(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude));
-        next();
+        if (authService.checkForFraud(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude))) {
+            next();
+        } else {
+            res.json({ error: 'Too much distance covered: Potential fraud'}).status(400).end();
+        }
     }
 });
 boxRouter.get('/boxesformap', (req, res) => {
-    boxService.getObjectsForLocation(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), config.mapQueryRadius, [3, 4]).then(result => {
+    boxService.getObjectsForLocation(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), config.mapQueryRadius, [2, 3, 4]).then(result => {
         res.json(result);
     });
 });
@@ -35,7 +38,6 @@ boxRouter.get('/boxesnearby', (req, res) => {
 
 boxRouter.get('/boxlist', (req, res) => {
     boxService.getBoxList(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), req.query.start ? req.query.start : 0, req.query.limit ? req.query.limit : 10).then(result => {
-        console.log(result);
         res.json(result);
     });
 });

@@ -18,6 +18,7 @@ firebaseAdmin.initializeApp(config);
 
 const firestore = firebaseAdmin.firestore();
 const firestoreStore = new FirestoreStore({ database: firestore});
+const storage = firebaseAdmin.storage();
 const sessionInstance = session({
     store: firestoreStore,
     secret: 'mysecret',
@@ -33,6 +34,7 @@ const geoCollection = geoFirestore.collection('geoLocation');
 export {
     firestore,
     firestoreStore,
+    storage,
     sessionInstance,
     boxCollection,
     userCollection,

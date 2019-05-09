@@ -1,5 +1,6 @@
 import admin from 'firebase-admin';
-import { boxCollection, geoCollection, firestore } from '../../firebaseConfig.js';
+import moment from 'moment';
+import { boxCollection, geoCollection, firestore, storage } from '../../firebaseConfig.js';
 import { geoDistance } from '../helper/location';
 import config from '../config';
 import { calculateApproximateNumber } from '../helper/basic';
@@ -41,9 +42,6 @@ export default class BoxService {
                             }
                             break;
                         case 2:
-                            if (!responseObj.box) {
-                                responseObj.box = [];                                
-                            }
                             if (false && user.permissions.includes('SHOW_BOX_LOCATION')) {
                                 responseObj.box.push(entryData);
                             } else {
@@ -51,21 +49,17 @@ export default class BoxService {
                                     lat: entryData.coordinates.latitude,
                                     lng: entryData.coordinates.longitude
                                 });
+                                console.log(distance);
                                 if (distance <= config.boxLocationMaxDistance) {
+                                    if (!responseObj.box) {
+                                        responseObj.box = [];                                
+                                    }
                                     responseObj.box.push({
                                         position: {
                                             latitude: entryData.coordinates.latitude,
                                             longitude: entryData.coordinates.longitude
                                         },
                                         id: entryData.id
-                                    });
-                                } else if (distance <= config.boxQueryDistance) {
-                                    if (!responseObj.boxNearby) {
-                                        responseObj.boxNearby = [];
-                                    }
-                                    responseObj.boxNearby.push({
-                                        id: entryData.id,
-                                        maxDistance: calculateApproximateNumber(distance, 50)
                                     });
                                 }
                             }
@@ -146,7 +140,7 @@ export default class BoxService {
         return new Promise((resolve, reject) => {       
             return boxCollection.doc(id).get().then(result => {
                 const boxData = result.data();
-                const box = {
+                let box = {
                     id: boxData.id,
                     title: boxData.title,
                     description: boxData.description,
@@ -158,40 +152,60 @@ export default class BoxService {
                         longitude: boxData.position.longitude
                     }
                 };
-                if (userData.permissions.includes('SHOW_BOX_LOCATION')) {
-                    if (boxData.foundBy) {
-                        boxData.foundBy.get().then(user => {
-                            box.foundBy = user.data().username;
-                            resolve(box);
-                        });
-                    } else {
+                this.completeUserData(box, boxData).then(box => {
+                    if (userData.permissions.includes('SHOW_BOX_LOCATION')) {
                         resolve(box);
-                    }
-                } else {
-                    const distance = geoDistance({
-                        lat: boxData.position.latitude,
-                        lng: boxData.position.longitude
-                    }, {
-                        lat: userData.lastLocation.latitude,
-                        lng: userData.lastLocation.longitude
-                    });
-                    if (distance < config.boxLocationMaxDistance) {
-                        if (boxData.foundBy) {
-                            boxData.foundBy.get().then(user => {
-                                console.log(user);
-                                box.foundBy = user.username;
-                                resolve(box);
-                            });
+                    } else {
+                        const distance = geoDistance({
+                            lat: boxData.position.latitude,
+                            lng: boxData.position.longitude
+                        }, {
+                            lat: userData.lastLocation.latitude,
+                            lng: userData.lastLocation.longitude
+                        });
+                        console.log('userlocation', userData.lastLocation);
+                        console.log('boxPosition', boxData.position);
+                        console.log(distance, config.boxLocationMaxDistance, boxData.foundBy);
+                        if (distance < config.boxLocationMaxDistance || boxData.foundBy) {
+                            console.log('test1');
+                            resolve(box);
                         } else {
+                            console.log('test2');
+                            box.maxDistance = calculateApproximateNumber(distance, 50);
+                            delete box.position;
+                            delete box.value;
+                            console.log(box);
                             resolve(box);
                         }
-                    } else {
-                        throw new Error('Box not found');
                     }
-                }
+                });
             }).catch((e) => {
-                throw new Error('Box not found');
+                console.log(e);
+                reject(new Error('Box not found'));
             });
+        });
+    }
+
+    completeUserData(box, boxData) {
+        return new Promise((resolve, reject) => {
+            if (boxData.foundBy) {
+                boxData.foundBy.get().then(user => {
+                    const userData = user.data();
+                    box.foundBy = userData.username;
+                    if (userData.imageUrl) {
+                        const fileRef = storage.bucket().file(userData.imageUrl);
+                        fileRef.getSignedUrl({ action: 'read', expires: moment().add(7, 'days').toDate() }).then(urls => {
+                            if (urls.length > 0) {
+                                box.foundByImage = urls[0];
+                            }
+                            resolve(box);
+                        });
+                    }
+                });
+            } else {
+                resolve(box);
+            }
+
         });
     }
 }
