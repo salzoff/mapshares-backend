@@ -5,13 +5,12 @@ const FirestoreStore = require('firestore-store')(session);
 import * as firebaseAdminCreds from './firebaseAdminCreds.json';
 
 const config = {
-    apiKey: 'AIzaSyDqHeavSoFvMB0VtZDBMfqNwC1VLW7A2PY',
-    authDomain: 'lively-aloe-233515.firebaseapp.com',
-    databaseURL: 'https://lively-aloe-233515.firebaseio.com',
-    projectId: 'lively-aloe-233515',
-    storageBucket: 'lively-aloe-233515.appspot.com',
-    messagingSenderId: '606237866833',
-    credential: firebaseAdmin.credential.cert(firebaseAdminCreds)
+    apiKey: 'AIzaSyDmDzfawPIvp3LG6g2WWzcJX9MHZZmLrLM',
+    authDomain: 'snoopo.firebaseapp.com',
+    databaseURL: 'https://snoopo.firebaseio.com',
+    projectId: 'snoopo',
+    storageBucket: 'snoopo.appspot.com',
+    messagingSenderId: '389656714226'
 };
 
 firebaseAdmin.initializeApp(config);

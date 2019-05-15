@@ -6,7 +6,7 @@ import { geoDistance } from '../helper/location';
 import { UserRefreshClient } from 'google-auth-library';
 
 let instance = false;
-const url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo?key=AIzaSyDqHeavSoFvMB0VtZDBMfqNwC1VLW7A2PY';
+const url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo?key=AIzaSyDmDzfawPIvp3LG6g2WWzcJX9MHZZmLrLM';
 const authRequest = axios.create({
     baseURL: url
 });
@@ -33,7 +33,7 @@ export default class AuthService {
                         resolve(user);
                     });
                 }).catch(e => {
-                    console.error('error', e);
+                    console.trace('auth request error', e);
                     reject();
                 });
         });
@@ -75,7 +75,6 @@ export default class AuthService {
     }
 
     checkForFraud(user, latitude, longitude) {
-        return true;
         if (user.temporaryLocations) {
             user.temporaryLocations = [];
         }

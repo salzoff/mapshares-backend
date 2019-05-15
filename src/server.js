@@ -12,6 +12,7 @@ app.use(cors());
 app.use(bearerToken());
 app.use(sessionInstance);
 app.use((req, res, next) => {
+    console.log('test');
     if (!req.session.user) {
         authService.getUserData(req.token)
             .then((user) => {
