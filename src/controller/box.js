@@ -24,25 +24,25 @@ boxRouter.use((req, res, next) => {
         }
     }
 });
-boxRouter.get('/boxesformap', (req, res) => {
+boxRouter.get('/formap', (req, res) => {
     boxService.getObjectsForLocation(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), config.mapQueryRadius, [2, 3, 4]).then(result => {
         res.json(result);
     });
 });
 
-boxRouter.get('/boxesnearby', (req, res) => {
+boxRouter.get('/nearby', (req, res) => {
     boxService.getObjectsForLocation(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), config.boxQueryDistance, [2, 4]).then(result => {
         res.json(result);
     });
 });
 
-boxRouter.get('/boxlist', (req, res) => {
+boxRouter.get('/list', (req, res) => {
     boxService.getBoxList(req.session.user, parseFloat(req.query.latitude), parseFloat(req.query.longitude), req.query.start ? req.query.start : 0, req.query.limit ? req.query.limit : 10).then(result => {
         res.json(result);
     });
 });
 
-boxRouter.get('/box/:id', (req, res) => {
+boxRouter.get('/:id', (req, res) => {
     boxService.getBoxById(req.params.id, req.session.user).then(result => {
         res.json(result);
     }).catch((e) => {

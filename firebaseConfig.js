@@ -10,7 +10,8 @@ const config = {
     databaseURL: 'https://snoopo.firebaseio.com',
     projectId: 'snoopo',
     storageBucket: 'snoopo.appspot.com',
-    messagingSenderId: '389656714226'
+    messagingSenderId: '389656714226',
+    credential: firebaseAdmin.credential.cert(firebaseAdminCreds)
 };
 
 firebaseAdmin.initializeApp(config);

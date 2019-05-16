@@ -4,6 +4,6 @@ import userRouter from '../controller/user';
 
 const router = express.Router();
 
-router.use('/', boxRouter);
-router.use('/', userRouter);
+router.use('/box', boxRouter);
+router.use('/user', userRouter);
 export default router;

@@ -4,6 +4,7 @@ module.exports = {
     entry: {
         index: './src/index.js'
     },
+    externals: {'firebase-admin': "require('firebase-admin')"},
     target: 'node',
     output: {
         filename: '[name].js',

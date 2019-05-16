@@ -163,9 +163,6 @@ export default class BoxService {
                             lat: userData.lastLocation.latitude,
                             lng: userData.lastLocation.longitude
                         });
-                        console.log('userlocation', userData.lastLocation);
-                        console.log('boxPosition', boxData.position);
-                        console.log(distance, config.boxLocationMaxDistance, boxData.foundBy);
                         if (distance < config.boxLocationMaxDistance || boxData.foundBy) {
                             console.log('test1');
                             resolve(box);

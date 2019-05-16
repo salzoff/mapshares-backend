@@ -33,7 +33,7 @@ export default class AuthService {
                         resolve(user);
                     });
                 }).catch(e => {
-                    console.trace('auth request error', e.message);
+                    console.error('auth request error', e.message);
                     reject();
                 });
         });
@@ -75,7 +75,7 @@ export default class AuthService {
     }
 
     checkForFraud(user, latitude, longitude) {
-        if (user.temporaryLocations) {
+        if (!user.temporaryLocations) {
             user.temporaryLocations = [];
         }
         const newEntry = {
