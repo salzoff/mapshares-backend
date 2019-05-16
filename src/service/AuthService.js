@@ -33,7 +33,7 @@ export default class AuthService {
                         resolve(user);
                     });
                 }).catch(e => {
-                    console.trace('auth request error', e);
+                    console.trace('auth request error', e.message);
                     reject();
                 });
         });
